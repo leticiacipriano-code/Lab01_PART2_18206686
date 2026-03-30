@@ -1,0 +1,109 @@
+
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Great Expectations - Relatório de Validação</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+                .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }
+                .summary { background: white; padding: 15px; margin: 20px 0; border-radius: 5px; border-left: 4px solid #27ae60; }
+                .validation { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #3498db; }
+                .pass { border-left-color: #27ae60; color: #27ae60; font-weight: bold; }
+                .fail { border-left-color: #e74c3c; color: #e74c3c; font-weight: bold; }
+                .warning { border-left-color: #f39c12; color: #f39c12; font-weight: bold; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                th { background: #34495e; color: white; }
+                tr:hover { background: #f9f9f9; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>🧬 Great Expectations - Relatório de Validação</h1>
+                <p>Camada Raw - Dados de Fertilidade</p>
+                <p><small>Gerado automaticamente - Validação de qualidade de dados</small></p>
+            </div>
+            
+            <div class="summary">
+                <h2>📊 Resumo</h2>
+                <p><strong>Total de Expectativas:</strong> 7</p>
+                <p class="pass">✅ Passed: 6</p>
+                <p><strong>Taxa de Sucesso:</strong> 85.7%</p>
+            </div>
+            
+            <h2>📋 Detalhes das Validações</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Expectativa</th>
+                        <th>Coluna/Detalhes</th>
+                        <th>Status</th>
+                        <th>Informações</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr>
+                        <td>expect_column_values_to_not_be_null</td>
+                        <td>age</td>
+                        <td class="pass">PASS</td>
+                        <td>0 nulos</td>
+                    </tr>
+            
+                    <tr>
+                        <td>expect_column_values_to_not_be_null</td>
+                        <td>season</td>
+                        <td class="pass">PASS</td>
+                        <td>0 nulos</td>
+                    </tr>
+            
+                    <tr>
+                        <td>expect_column_values_to_not_be_null</td>
+                        <td>diagnosis</td>
+                        <td class="pass">PASS</td>
+                        <td>0 nulos</td>
+                    </tr>
+            
+                    <tr>
+                        <td>expect_column_values_to_be_between</td>
+                        <td>age</td>
+                        <td class="pass">PASS</td>
+                        <td>0 fora do intervalo</td>
+                    </tr>
+            
+                    <tr>
+                        <td>expect_column_distinct_values_to_be_in_set</td>
+                        <td>diagnosis</td>
+                        <td class="pass">PASS</td>
+                        <td>0 inválidos</td>
+                    </tr>
+            
+                    <tr>
+                        <td>expect_column_distinct_values_to_be_in_set</td>
+                        <td>season</td>
+                        <td class="pass">PASS</td>
+                        <td>0 inválidos</td>
+                    </tr>
+            
+                    <tr>
+                        <td>expect_no_duplicate_rows</td>
+                        <td>N/A</td>
+                        <td class="warning">WARNING</td>
+                        <td>98086 duplicatas</td>
+                    </tr>
+            
+                </tbody>
+            </table>
+            
+            <div class="summary" style="margin-top: 30px;">
+                <h2>📁 Próximos Passos</h2>
+                <ol>
+                    <li>Revisar os dados em data_raw/fertility_1m.csv</li>
+                    <li>Executar transformações na camada Silver</li>
+                    <li>Agregar na camada Gold para análise</li>
+                    <li>Visualizar no dashboard Grafana</li>
+                </ol>
+            </div>
+        </body>
+        </html>
+        

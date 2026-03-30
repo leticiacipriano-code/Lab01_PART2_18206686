@@ -1,0 +1,45 @@
+{
+  "dashboard": {
+    "title": "Fertility Data Overview",
+    "tags": ["fertility", "data"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "Total Records",
+        "targets": [
+          {
+            "rawSql": "SELECT COUNT(*) as value FROM fertility_data",
+            "refId": "A"
+          }
+        ],
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 }
+      },
+      {
+        "title": "Records by Season",
+        "targets": [
+          {
+            "rawSql": "SELECT season, COUNT(*) as count FROM fertility_data GROUP BY season",
+            "refId": "A"
+          }
+        ],
+        "type": "table",
+        "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 }
+      },
+      {
+        "title": "Age Distribution",
+        "targets": [
+          {
+            "rawSql": "SELECT ROUND(age/10)*10 as age_group, COUNT(*) as count FROM fertility_data GROUP BY ROUND(age/10)*10 ORDER BY age_group",
+            "refId": "A"
+          }
+        ],
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
+      }
+    ],
+    "schemaVersion": 30,
+    "version": 1,
+    "refresh": "10s"
+  }
+}

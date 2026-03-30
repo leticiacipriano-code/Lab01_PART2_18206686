@@ -1,0 +1,94 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv
+venv/
+ENV/
+env/
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Great Expectations
+gx_context/uncommitted/
+gx_context/expectations/
+gx_context/plugins/
+
+# Data (keep CSVs/configs, ignore temp/cache)
+*.db
+*.sqlite
+*.duckdb
+/data_raw/*.parquet
+/data_raw/*.pickle
+/data_silver/*.csv
+/data_gold/*.db
+.great_expectations/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Test/Coverage
+.coverage
+.pytest_cache/
+htmlcov/
+.hypothesis/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Grafana (local testing)
+grafana/data/
+grafana/provisioning/*/uncommitted/
+
+# Config (except example files)
+.env
+!.env.example
+
+# Node modules (if using node tools)
+node_modules/
