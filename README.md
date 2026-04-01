@@ -1,16 +1,16 @@
-# 🧬 Fertility Data Pipeline - Lab01_B
+#  Lab01_PART2_18106686 
 
-## 📋 Visão Geral
+##  Visão Geral
 
 Pipeline de dados completo seguindo o padrão **Medallion Architecture** (Raw → Silver → Gold) com:
-- ✅ Containerização Docker (PostgreSQL + Grafana)
-- ✅ Validação de qualidade com Great Expectations (5+ expectativas)
-- ✅ Dashboard Grafana com 6+ visualizações
-- ✅ Documentação reproduzível
+-  Containerização Docker (PostgreSQL + Grafana)
+-  Validação de qualidade com Great Expectations (5+ expectativas)
+-  Dashboard Grafana com 6+ visualizações
+-  Documentação reproduzível
 
 ---
 
-## 🚀 Início Rápido
+##  Início Rápido
 
 ### Pré-requisitos
 
@@ -29,8 +29,8 @@ python --version
 ### 1. Clone o Repositório
 
 ```bash
-git clone https://github.com/seu-usuario/Lab01_PART2_NUSP.git
-cd Lab01_PART2_NUSP
+git clone https://github.com/seu-usuario/Lab01_PART2_18106686.git
+cd Lab01_PART2_18106686
 ```
 
 ### 2. Configure o Ambiente Virtual
@@ -64,24 +64,19 @@ source .venv/bin/activate  # Linux/macOS
 # Via requirements.txt
 pip install -r requirements.txt
 
-# Ou via pyproject.toml
+# Ou via pyproject.toml (recomendado)
 pip install -e .
+
+# Ou via uv (mais rápido com uv.lock)
+uv pip install -r requirements.txt
 ```
 
-### 4. Configure Variáveis de Ambiente
+### 4. Variáveis de Ambiente
 
-```bash
-# Copiar exemplo
-cp .env.example .env
-
-# Editar .env com credenciais
-# DB_HOST=postgres (dentro Docker) ou localhost (fora)
-# DB_PASSWORD=senha
-```
-
+Use as variáveis disponíveis em .env
 ---
 
-## 🐳 Como Construir e Subir os Containers
+##  Como Construir e Subir os Containers
 
 ### Passo 1: Construir a Imagem Docker
 
@@ -96,13 +91,16 @@ docker images | grep fertility
 ### Passo 2: Subir Containers com Docker Compose
 
 ```bash
-# Subir todos os containers
+# Subir todos os containers (PostgreSQL + Grafana)
 docker-compose up -d
 
 # Verificar status
 docker-compose ps
 
 # Logs em tempo real
+docker-compose logs -f
+
+# Logs de serviço específico
 docker-compose logs -f postgres
 docker-compose logs -f grafana
 ```
@@ -110,37 +108,60 @@ docker-compose logs -f grafana
 ### Passo 3: Verificar Conectividade
 
 ```bash
-# Teste 1: PostgreSQL
-docker exec fertility_postgres psql -U postgres -d fertility_gold -c "SELECT version();"
+# Teste 1: PostgreSQL está disponível
+docker-compose exec postgres psql -U postgres -d fertility_gold -c "SELECT version();"
 
-# Teste 2: Grafana (espere ~10s)
+# Teste 2: Grafana (espere ~10-15s após inicialização)
 curl http://localhost:3000/api/health
 
 # Teste 3: Rede Docker
-docker network ls | grep fertility
+docker network ls | grep lab01
 ```
 
 ---
 
-## ✅ Como Executar as Validações do Great Expectations
+##  Como Executar o Pipeline de Dados
 
-### Executar Validações
+### Opção 1: Script Principal (Recomendado)
 
 ```bash
-# 1. Ativar ambiente virtual
+# Ativar ambiente virtual
 .\.venv\Scripts\activate  # Windows
 # ou
 source .venv/bin/activate  # Linux/macOS
+
+# Ver opções disponíveis
+python main.py --help
+
+# Executar validações apenas
+python main.py validate
+
+# Executar ingestão apenas
+python main.py ingest
+
+# Executar pipeline completo (validação + ingestão)
+python main.py full
+# ou simplesmente
+python main.py
+```
+
+### Opção 2: Executar Validações com Great Expectations
+
+```bash
+# 1. Ativar ambiente virtual
+source .venv/bin/activate  # Linux/macOS
+# ou
+.\.venv\Scripts\activate  # Windows
 
 # 2. Executar validação
 python src/setup_great_expectations.py
 
 # Saída esperada:
-# ✅ 5 expectativas validadas
-# ✅ Data Docs gerado em: gx_context/data_docs/index.html
+#  5+ expectativas validadas
+#  Data Docs gerado em: gx_context/data_docs/index.html
 ```
 
-### Ver Relatório de Validação
+### Opção 3: Ver Relatório de Validação
 
 ```bash
 # Abrir no navegador:
@@ -166,41 +187,44 @@ open gx_context/data_docs/index.html
 
 ---
 
-## 📥 Como Ingerir Dados
+##  Como Ingerir Dados
 
 ### Pipeline de Ingestão Automático
 
 ```bash
-# 1. Ativar ambiente
-.\.venv\Scripts\activate
+# Usando main.py
+python main.py ingest
 
-# 2. Executar pipeline
+# Ou executar manualmente
 python src/ingest_data.py
-
-# Passos executados:
-# 1. Valida dados com Great Expectations
-# 2. Carrega fertility_1m.csv
-# 3. Conecta ao PostgreSQL (via Docker)
-# 4. Cria tabela fertility_data
-# 5. Insere 1.000.000 registros em batches
-# 6. Verifica integridade
 ```
+
+**O que faz o pipeline:**
+1. Valida dados com Great Expectations
+2. Carrega `data_raw/fertility_1m.csv`
+3. Conecta ao PostgreSQL (container Docker)
+4. Cria tabela `fertility_data` em `fertility_gold`
+5. Insere 1.000.000+ registros em batches
+6. Verifica integridade dos dados
 
 ### Verificar Dados Ingeridos
 
 ```bash
 # Conectar ao PostgreSQL
-docker exec -it fertility_postgres psql -U postgres -d fertility_gold
+docker-compose exec postgres psql -U postgres -d fertility_gold
 
 # No prompt psql:
 SELECT COUNT(*) FROM fertility_data;
 SELECT diagnosis, COUNT(*) FROM fertility_data GROUP BY diagnosis;
 SELECT season, COUNT(*) FROM fertility_data GROUP BY season;
+
+# Sair
+\q
 ```
 
 ---
 
-## 📈 Dashboard Grafana
+##  Dashboard Grafana
 
 ### Acessar o Dashboard
 
@@ -228,191 +252,69 @@ SELECT season, COUNT(*) FROM fertility_data GROUP BY season;
 
 ---
 
-## 🔍 Estrutura do Projeto
+##  Estrutura do Projeto
 
 ```
-Lab01_PART2_NUSP/
-├── src/
-│   ├── ingest_data.py              # 📥 Pipeline de ingestão
-│   └── setup_great_expectations.py # ✅ Validação de dados
-├── data_raw/
-│   └── fertility_1m.csv            # 📊 1M registros brutos
-├── data_silver/
-│   ├── silver.py                   # 🔄 Transformações
-│   ├── relatorio_silver.md         # 📋 Docs
-│   └── fertility_silver.parquet     # 📦 Dados agregados
-├── data_gold/
-│   ├── gold.py                     # 🎯 Análises finais
-│   ├── relatorio_gold.md           # 📋 Docs
-├── grafana/
-│   ├── dashboards/                 # 📈 Painéis
-│   └── provisioning/               # ⚙️ Config
-├── gx_context/
-│   └── data_docs/                  # 📄 Relatório validação
-├── docker-compose.yml              # 🐳 Orquestração
-├── Dockerfile                      # 🔨 Imagem app
-├── pyproject.toml                  # 📦 Dependências modernas
-├── requirements.txt                # 📦 Compatibilidade
-├── .gitignore                      # 🚫 Git ignore
-├── .env.example                    # ⚙️ Exemplo config
-└── README.md                       # 📖 Este arquivo
+Lab01_PART2_18106686/
+├── src/                                # 📂 Código principal
+│   ├── __init__.py                     
+│   ├── ingest_data.py                  # 📥 Pipeline de ingestão
+│   └── setup_great_expectations.py     # ✅ Validação de dados
+├── main.py                             # 🚀 Script principal (orquestrador)
+│
+├── data_raw/                           # 📊 Dados brutos
+│   └── fertility_1m.csv                # 1.000.000 registros de entrada
+│
+├── data_silver/                        # 🔄 Dados processados
+│   ├── silver.py                       # Transformações intermediárias
+│   └── relatorio_silver.md             # 📋 Documentação de silver
+│
+├── data_gold/                          # 🎯 Dados refinados (análises)
+│   ├── gold.py                         # Análises finais e agregações
+│   └── relatorio_gold.md               # 📋 Documentação de gold
+│
+├── grafana/                            # 📈 Dashboard e provisioning
+│   ├── dashboards/
+│   │   └── fertility-main.json         # Dashboard Grafana
+│   └── provisioning/
+│       ├── dashboards/
+│       │   └── dashboards.yaml         # Config automática dashboards
+│       └── datasources/
+│           └── postgresql.yaml         # Config PostgreSQL data source
+│
+├── gx_context/                         # ✅ Great Expectations
+│   └── data_docs/
+│       └── index.html                  # Relatório validação (HTML)
+│
+├── docker-compose.yml                  # 🐳 Orquestração: PostgreSQL + Grafana
+├── Dockerfile                          # 🔨 Imagem aplicação Python
+├── init.sql                            # 🗄️ Inicialização banco de dados
+│
+├── pyproject.toml                      # 📦 Dependências (formato moderno)
+├── requirements.txt                    # 📦 Compatibilidade
+├── dependencies_frozen.txt             # 📦 Lock dependencies
+├── uv.lock.txt                         # 🔐 UV lock file
+├── .gitignore                          # 🚫 Git ignore
+│
+└── README.md                           # 📖 Este arquivo
 ```
 
 ---
 
 ## 🛠️ Troubleshooting
 
-### Erro: "Connection refused"
+### Limpar tudo e começar do zero
 
 ```bash
-# Verificar se containers estão rodando
-docker-compose ps
+# Option 1: Parar containers mantendo volumes
+docker-compose stop
 
-# Se não estão, iniciar
+# Option 2: Parar e remover containers + volumes (⚠️ deleta dados)
+docker-compose down -v
+
+# Reconstruir imagem
+docker build -t fertility-app:latest .
+
+# Reiniciar
 docker-compose up -d
 ```
-
-### Erro: "Password authentication failed"
-
-```bash
-# Resetar senha do PostgreSQL
-docker exec fertility_postgres psql -U postgres -c "ALTER USER postgres WITH PASSWORD 'senha';"
-```
-
-### Grafana não mostra dados
-
-```bash
-# 1. Verificar datasource
-# Admin → Data Sources → PostgreSQL Fertility → Test
-
-# 2. Verificar conexão ao banco
-docker exec fertility_postgres psql -U postgres -d fertility_gold -c "SELECT COUNT(*) FROM fertility_data;"
-
-# 3. Atualizar dashboard
-python fix_grafana_datasource.py
-```
-
----
-
-## 📝 Requisitos Atendidos
-
-✅ **Estrutura de Código**
-- [x] Repositório GitHub público (Lab01_PART2_NUSP)
-- [x] Ambiente virtual com .venv/venv
-- [x] pyproject.toml + requirements.txt
-- [x] .gitignore completo
-
-✅ **Infraestrutura Containerizada**
-- [x] PostgreSQL via Docker
-- [x] Dockerfile para aplicação
-- [x] docker-compose.yml
-- [x] Network (fertility_network)
-
-✅ **Qualidade de Dados**
-- [x] Great Expectations configurado
-- [x] 5 expectativas distintas
-- [x] Data Docs (HTML)
-
-✅ **Visualização de Dados**
-- [x] Grafana conectado ao PostgreSQL
-- [x] 6 visualizações (stat, gauge, pizza, barras, histograma, tabela)
-
-✅ **Documentação**
-- [x] README.md completo
-- [x] Instruções Docker
-- [x] Instruções Great Expectations
-- [x] Passo a passo reproduzível
-
----
-
-**Data**: Março 2026  
-**Status**: ✅ Projeto Completo  
-**Versão**: 1.0.0
-
-### 3.4 Executar pipeline completo de dados (com validações)
-```bash
-# Executar main que processa as camadas
-.venv\Scripts\python.exe scripts/main
-
-# Ou exportar para PostgreSQL diretamente
-.venv\Scripts\python.exe scripts/export_to_postgres.py
-```
-
-## 🔧 Troubleshooting
-
-### Erro: "Could not connect to PostgreSQL"
-```bash
-# Verificar se container está rodando
-docker ps | grep fertility_postgres
-
-# Se não estiver, reiniciar
-docker-compose -f config/docker-compose.yml restart postgres
-```
-
-### Erro: "Great Expectations not found"
-```bash
-# Reinstalar dependências
-.venv\Scripts\python.exe -m pip install great-expectations>=0.17.0
-```
-
-### Ver logs do container app
-```bash
-docker-compose -f config/docker-compose.yml logs -f app
-```
-
-### Limpar tudo e começar do zero
-```bash
-# Parar e remover todos os containers e volumes
-docker-compose -f config/docker-compose.yml down -v
-
-# Reconstruir
-docker build -f config/Dockerfile -t fertility-app:latest .
-docker-compose -f config/docker-compose.yml up -d
-```
-
-## 📊 Arquitetura
-
-```
-┌─────────────────────────────────────┐
-│     Docker Compose                  │
-├─────────────────────────────────────┤
-│                                     │
-│  ┌──────────────┐  ┌────────────┐  │
-│  │  PostgreSQL  │  │  Grafana   │  │
-│  │   :5432      │  │  :3000     │  │
-│  └──────────────┘  └────────────┘  │
-│                                     │
-│  ┌──────────────────────────────┐  │
-│  │  App Container               │  │
-│  │  • Raw Data Validation (GX)  │  │
-│  │  • Data Processing           │  │
-│  │  • Export to PostgreSQL      │  │
-│  └──────────────────────────────┘  │
-│                                     │
-└─────────────────────────────────────┘
-```
-
-## 📚 Estrutura de Pastas
-
-```
-config/              → Docker, Dockerfile, SQL
-scripts/             → Python executáveis
-data_raw/            → Dados brutos + validações GX
-data_silver/         → Dados processados
-data_gold/           → Dados refinados
-grafana/             → Dashboards e provisioning
-```
-
-## 🎯 Próximos Passos
-
-1. ✅ Construir imagem: `docker build -f config/Dockerfile -t fertility-app:latest .`
-2. ✅ Subir containers: `docker-compose -f config/docker-compose.yml up -d`
-3. ✅ Validar dados: `.venv\Scripts\python.exe data_raw/validate_raw_data.py`
-4. ✅ Acessar Grafana: `http://localhost:3000`
-
-## 📞 Suporte
-
-Para problemas, check:
-- Logs dos containers: `docker-compose logs [service_name]`
-- Relatórios GX: `data_raw/gx_context/data_docs/index.html`
-- Variáveis de ambiente: `.env`

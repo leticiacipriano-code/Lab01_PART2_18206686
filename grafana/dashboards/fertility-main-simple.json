@@ -22,46 +22,21 @@
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
+          "color": {"mode": "thresholds"},
           "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
+          "thresholds": {"mode": "absolute", "steps": [{"color": "blue", "value": null}]},
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 0,
-        "y": 0
-      },
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
       "id": 1,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
+        "reduceOptions": {"values": false, "calcs": ["lastNotNull"], "fields": ""},
         "textMode": "auto"
       },
       "pluginVersion": "8.0.0",
@@ -79,42 +54,21 @@
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
+          "color": {"mode": "thresholds"},
           "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              }
-            ]
-          },
+          "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}]},
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 6,
-        "y": 0
-      },
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
       "id": 2,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
+        "reduceOptions": {"values": false, "calcs": ["lastNotNull"], "fields": ""},
         "textMode": "auto"
       },
       "pluginVersion": "8.0.0",
@@ -132,42 +86,21 @@
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
+          "color": {"mode": "thresholds"},
           "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]},
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 12,
-        "y": 0
-      },
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
       "id": 3,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
+        "reduceOptions": {"values": false, "calcs": ["lastNotNull"], "fields": ""},
         "textMode": "auto"
       },
       "pluginVersion": "8.0.0",
@@ -185,40 +118,18 @@
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "tooltip": false,
-              "viz": false,
-              "legend": false
-            }
-          },
+          "color": {"mode": "palette-classic"},
+          "custom": {"hideFrom": {"tooltip": false, "viz": false, "legend": false}},
           "mappings": []
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 9,
-        "w": 8,
-        "x": 0,
-        "y": 6
-      },
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 4},
       "id": 4,
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "values": [
-            "value",
-            "percent"
-          ]
-        },
+        "legend": {"displayMode": "list", "placement": "bottom", "values": ["value", "percent"]},
         "pieType": "pie",
-        "tooltip": {
-          "mode": "single"
-        }
+        "tooltip": {"mode": "single"}
       },
       "pluginVersion": "8.0.0",
       "targets": [
@@ -235,40 +146,18 @@
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "tooltip": false,
-              "viz": false,
-              "legend": false
-            }
-          },
+          "color": {"mode": "palette-classic"},
+          "custom": {"hideFrom": {"tooltip": false, "viz": false, "legend": false}},
           "mappings": []
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 9,
-        "w": 8,
-        "x": 8,
-        "y": 6
-      },
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 4},
       "id": 5,
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "values": [
-            "value",
-            "percent"
-          ]
-        },
+        "legend": {"displayMode": "list", "placement": "bottom", "values": ["value", "percent"]},
         "pieType": "pie",
-        "tooltip": {
-          "mode": "single"
-        }
+        "tooltip": {"mode": "single"}
       },
       "pluginVersion": "8.0.0",
       "targets": [
@@ -285,40 +174,18 @@
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "tooltip": false,
-              "viz": false,
-              "legend": false
-            }
-          },
+          "color": {"mode": "palette-classic"},
+          "custom": {"hideFrom": {"tooltip": false, "viz": false, "legend": false}},
           "mappings": []
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 9,
-        "w": 8,
-        "x": 16,
-        "y": 6
-      },
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 4},
       "id": 6,
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "values": [
-            "value",
-            "percent"
-          ]
-        },
+        "legend": {"displayMode": "list", "placement": "bottom", "values": ["value", "percent"]},
         "pieType": "pie",
-        "tooltip": {
-          "mode": "single"
-        }
+        "tooltip": {"mode": "single"}
       },
       "pluginVersion": "8.0.0",
       "targets": [
@@ -335,35 +202,17 @@
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "tooltip": false,
-              "viz": false,
-              "legend": false
-            }
-          },
+          "custom": {"hideFrom": {"tooltip": false, "viz": false, "legend": false}},
+          "color": {"mode": "palette-classic"},
           "mappings": []
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 15
-      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
       "id": 7,
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "right"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
+        "legend": {"displayMode": "list", "placement": "bottom"},
+        "tooltip": {"mode": "multi"}
       },
       "pluginVersion": "8.0.0",
       "targets": [
@@ -380,34 +229,15 @@
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "auto",
-            "displayMode": "auto"
-          },
+          "custom": {"align": "auto", "displayMode": "auto"},
           "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 15
-      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
       "id": 8,
-      "options": {
-        "showHeader": true,
-        "sortBy": []
-      },
+      "options": {"showHeader": true, "sortBy": []},
       "pluginVersion": "8.0.0",
       "targets": [
         {
@@ -429,6 +259,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Fertility Data - Dashboard Simples",
-  "uid": "fertility-simple-main",
+  "uid": "fertility-simple-001",
   "version": 1
 }
