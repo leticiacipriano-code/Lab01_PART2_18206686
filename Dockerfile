@@ -26,4 +26,4 @@ RUN pip install --upgrade pip && \
 COPY . .
 
 # Define o comando de entrada
-CMD ["python", "main"]
+CMD ["python", "main.py"]

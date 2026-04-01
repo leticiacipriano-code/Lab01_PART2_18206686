@@ -32,13 +32,9 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-    volumes:
-      - .:/app
-      - /app/__pycache__
     networks:
       - fertility_network
     restart: unless-stopped
-    command: ["python", "main"]
 
   grafana:
     image: grafana/grafana:latest
