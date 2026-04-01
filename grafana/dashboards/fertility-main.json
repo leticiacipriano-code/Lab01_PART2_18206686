@@ -21,96 +21,618 @@
     {
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 6,
+        "w": 6,
         "x": 0,
         "y": 0
       },
-      "id": 2,
+      "id": 1,
       "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
         "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
         "textMode": "auto"
       },
       "pluginVersion": "8.0.0",
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) as \"Total Registros\" FROM fertility_data",
+          "rawSql": "SELECT COUNT(*) as value FROM fertility_warehouse.fact_fertility",
           "refId": "A"
         }
       ],
-      "title": "Total de Registros",
+      "title": "Total de Pacientes",
       "type": "stat"
     },
     {
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
+        "h": 6,
+        "w": 6,
+        "x": 6,
         "y": 0
       },
-      "id": 3,
-      "options": {},
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "auto"
+      },
       "pluginVersion": "8.0.0",
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT diagnosis, COUNT(*) as count FROM fertility_data GROUP BY diagnosis ORDER BY diagnosis",
+          "rawSql": "SELECT ROUND(CAST(COUNT(CASE WHEN diagnosis = 'Altered' THEN 1 END) AS FLOAT) / COUNT(*), 2) as value FROM fertility_warehouse.fact_fertility",
           "refId": "A"
         }
       ],
-      "title": "Por Diagnóstico",
+      "title": "Taxa de Diagnóstico Alterado",
+      "type": "stat"
+    },
+    {
+      "datasource": "PostgreSQL Fertility",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(CASE WHEN diagnosis = 'Altered' THEN 1 END) as value FROM fertility_warehouse.fact_fertility",
+          "refId": "A"
+        }
+      ],
+      "title": "Pacientes com Infertilidade",
+      "type": "stat"
+    },
+    {
+      "datasource": "PostgreSQL Fertility",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 6
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "pie",
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT smoking_habit as \"Hábito de Fumo\", COUNT(*) as value FROM fertility_warehouse.fact_fertility GROUP BY smoking_habit ORDER BY value DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Análise 1: Distribuição de Fumantes",
+      "type": "piechart"
+    },
+    {
+      "datasource": "PostgreSQL Fertility",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 6
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "pie",
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT season as \"Estação\", COUNT(*) as value FROM fertility_warehouse.fact_fertility GROUP BY season ORDER BY CASE WHEN season='Winter' THEN 1 WHEN season='Spring' THEN 2 WHEN season='Summer' THEN 3 WHEN season='Fall' THEN 4 END",
+          "refId": "A"
+        }
+      ],
+      "title": "Análise 3: Sazonalidade",
+      "type": "piechart"
+    },
+    {
+      "datasource": "PostgreSQL Fertility",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 100,
+            "gradientMode": "none",
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 6
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT CASE WHEN number_of_hours_spent_sitting_per_day < 5 THEN 'Baixo (0-5h)' WHEN number_of_hours_spent_sitting_per_day < 10 THEN 'Médio (5-10h)' WHEN number_of_hours_spent_sitting_per_day < 15 THEN 'Alto (10-15h)' ELSE 'Crítico (15+h)' END as \"Categoria de Sedentarismo\", COUNT(*) as value FROM fertility_warehouse.fact_fertility GROUP BY CASE WHEN number_of_hours_spent_sitting_per_day < 5 THEN 'Baixo (0-5h)' WHEN number_of_hours_spent_sitting_per_day < 10 THEN 'Médio (5-10h)' WHEN number_of_hours_spent_sitting_per_day < 15 THEN 'Alto (10-15h)' ELSE 'Crítico (15+h)' END ORDER BY value DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Análise 2: Categorias de Sedentarismo",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "PostgreSQL Fertility",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Número de Pacientes",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 100,
+            "gradientMode": "none",
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 15
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "sum"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT diagnosis, COUNT(*) as value FROM fertility_warehouse.fact_fertility GROUP BY diagnosis ORDER BY value DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Distribuição de Diagnósticos",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "PostgreSQL Fertility",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 15
+      },
+      "id": 8,
+      "options": {
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT diagnosis, COUNT(*) as \"Total de Pacientes\", ROUND(CAST(COUNT(CASE WHEN diagnosis = 'Altered' THEN 1 END) AS FLOAT) / COUNT(*) * 100, 2) as \"% Alterado\" FROM fertility_warehouse.fact_fertility GROUP BY diagnosis",
+          "refId": "A"
+        }
+      ],
+      "title": "Resumo de Diagnósticos",
       "type": "table"
     },
     {
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 24
       },
-      "id": 4,
-      "options": {},
+      "id": 9,
+      "options": {
+        "showHeader": true,
+        "sortBy": []
+      },
       "pluginVersion": "8.0.0",
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT season, COUNT(*) as count FROM fertility_data GROUP BY season ORDER BY CASE WHEN season='Winter' THEN 1 WHEN season='Spring' THEN 2 WHEN season='Summer' THEN 3 WHEN season='Fall' THEN 4 END",
+          "rawSql": "SELECT smoking_habit as \"Hábito de Fumo\", COUNT(*) as \"Total de Pacientes\", COUNT(CASE WHEN diagnosis = 'Altered' THEN 1 END) as \"Diagnóstico Alterado\", ROUND(CAST(COUNT(CASE WHEN diagnosis = 'Altered' THEN 1 END) AS FLOAT) / COUNT(*) * 100, 2) as \"Taxa de Alteração (%)\", ROUND(CAST(COUNT(*) AS FLOAT) / (SELECT COUNT(*) FROM fertility_warehouse.fact_fertility) * 100, 2) as \"Percentual na População (%)\" FROM fertility_warehouse.fact_fertility GROUP BY smoking_habit ORDER BY \"Total de Pacientes\" DESC",
           "refId": "A"
         }
       ],
-      "title": "Distribuição por Estação",
+      "title": "Análise 1 Detalhada: Impacto do Fumo na Fertilidade",
+      "type": "table"
+    },
+    {
+      "datasource": "PostgreSQL Fertility",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 10,
+      "options": {
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT CASE WHEN number_of_hours_spent_sitting_per_day < 5 THEN 'Baixo (0-5h)' WHEN number_of_hours_spent_sitting_per_day < 10 THEN 'Médio (5-10h)' WHEN number_of_hours_spent_sitting_per_day < 15 THEN 'Alto (10-15h)' ELSE 'Crítico (15+h)' END as \"Categoria de Sedentarismo\", ROUND(AVG(number_of_hours_spent_sitting_per_day), 1) as \"Horas Médias/Dia\", COUNT(*) as \"Total de Pacientes\", COUNT(CASE WHEN diagnosis = 'Altered' THEN 1 END) as \"Diagnóstico Alterado\", ROUND(CAST(COUNT(CASE WHEN diagnosis = 'Altered' THEN 1 END) AS FLOAT) / COUNT(*) * 100, 2) as \"Taxa de Alteração (%)\" FROM fertility_warehouse.fact_fertility GROUP BY CASE WHEN number_of_hours_spent_sitting_per_day < 5 THEN 'Baixo (0-5h)' WHEN number_of_hours_spent_sitting_per_day < 10 THEN 'Médio (5-10h)' WHEN number_of_hours_spent_sitting_per_day < 15 THEN 'Alto (10-15h)' ELSE 'Crítico (15+h)' END ORDER BY \"Horas Médias/Dia\"",
+          "refId": "A"
+        }
+      ],
+      "title": "Análise 2 Detalhada: Impacto do Sedentarismo na Fertilidade",
+      "type": "table"
+    },
+    {
+      "datasource": "PostgreSQL Fertility",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 40
+      },
+      "id": 11,
+      "options": {
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT season as \"Estação\", COUNT(*) as \"Total de Pacientes\", COUNT(CASE WHEN diagnosis = 'Altered' THEN 1 END) as \"Diagnóstico Alterado\", ROUND(CAST(COUNT(CASE WHEN diagnosis = 'Altered' THEN 1 END) AS FLOAT) / COUNT(*) * 100, 2) as \"Taxa de Alteração (%)\", ROUND(CAST(COUNT(*) AS FLOAT) / (SELECT COUNT(*) FROM fertility_warehouse.fact_fertility) * 100, 2) as \"Percentual na População (%)\" FROM fertility_warehouse.fact_fertility GROUP BY season ORDER BY CASE WHEN season='Winter' THEN 1 WHEN season='Spring' THEN 2 WHEN season='Summer' THEN 3 WHEN season='Fall' THEN 4 END",
+          "refId": "A"
+        }
+      ],
+      "title": "Análise 3 Detalhada: Sazonalidade e Diagnósticos",
       "type": "table"
     }
   ],
-  "refresh": "10s",
+  "refresh": "30s",
   "schemaVersion": 27,
   "style": "dark",
-  "tags": ["fertility", "data"],
+  "tags": [
+    "fertility",
+    "data",
+    "analysis"
+  ],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-30d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Fertility Data Dashboard",
-  "uid": "fertility-dash-001",
+  "title": "Fertility Data - Análises de Negócio (Gold Layer)",
+  "uid": "fertility-dash-gold-001",
   "version": 1
 }
