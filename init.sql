@@ -29,7 +29,6 @@ CREATE TABLE IF NOT EXISTS fertility_warehouse.fact_fertility (
     patient_id SERIAL PRIMARY KEY,
     age INT NOT NULL,
     season VARCHAR(50),
-    childrens_count VARCHAR(50),
     childish_diseases VARCHAR(50),
     accident_or_serious_trauma VARCHAR(50),
     surgical_intervention VARCHAR(50),

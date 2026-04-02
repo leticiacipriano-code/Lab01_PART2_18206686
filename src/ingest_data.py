@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Script de ingestão principal: carrega dados de fertility_1m.csv para PostgreSQL.
+Script de ingestão: carrega dados processados (Silver Layer) para PostgreSQL Warehouse.
 
 Este script:
-1. Carrega dados do CSV
-2. Valida qualidade com Great Expectations
-3. Insere em batches no PostgreSQL
+1. Lê dados do fertility_silver.parquet (já processados e validados)
+2. Conecta ao PostgreSQL fertility_db
+3. Insere em fertility_warehouse.fact_fertility em batches
 4. Verifica integridade final
 """
 
@@ -50,10 +50,10 @@ def wait_for_postgres(db_host, db_port, db_user, db_pass, db_name=None, max_retr
 
 
 def ingest_fertility_data():
-    """Executa pipeline de ingestão completo."""
+    """Executa pipeline de ingestão de dados processados para warehouse."""
     
     print("\n" + "=" * 70)
-    print(" PIPELINE DE INGESTÃO - FERTILITY DATA")
+    print(" PIPELINE DE INGESTÃO - FERTILITY DATA (SILVER → WAREHOUSE)")
     print("=" * 70)
     
     # 1. Carregar variaveis de ambiente (NAO sobrescrever ja definidas)
@@ -69,29 +69,29 @@ def ingest_fertility_data():
     print(f"  Banco de dados: {db_user}@{db_host}:{db_port}/{db_name}")
     
     project_root = Path(__file__).parent.parent
-    csv_path = project_root / "data_raw" / "fertility_1m.csv"
+    parquet_path = project_root / "data_silver" / "fertility_silver.parquet"
     
-    # 2. Aguardar PostgreSQL estar pronto
-    print("\n Aguardando PostgreSQL estar pronto...")
-    if not wait_for_postgres(db_host, db_port, db_user, db_pass, db_name):
-        print("  ERRO: Impossivel conectar ao PostgreSQL. Abortando.")
+    # 2. Verificar se arquivo parquet existe
+    print("\n Verificando dados processados...")
+    if not parquet_path.exists():
+        print(f"  ERRO: Arquivo {parquet_path} nao encontrado.")
+        print("  Execute silver.py primeiro para processar os dados brutos.")
         return
     
-    # 3. Validar dados com Great Expectations
-    print("\n Validando dados com Great Expectations...")
+    # 3. Carregar dados do parquet
+    print(f"\n Carregando dados de {parquet_path.name}...")
     try:
-        setup_great_expectations()
-    except Exception as e:
-        print(f"  Aviso na validacao: {e}")
-    
-    # 4. Carregar dados
-    print("\n Carregando dados do CSV...")
-    try:
-        df = pd.read_csv(csv_path)
+        df = pd.read_parquet(parquet_path)
         print(f"   {len(df):,} registros carregados")
         print(f"   Colunas: {list(df.columns)}")
     except Exception as e:
-        print(f"   ERRO ao carregar CSV: {e}")
+        print(f"   ERRO ao carregar parquet: {e}")
+        return
+    
+    # 4. Aguardar PostgreSQL estar pronto
+    print("\n Aguardando PostgreSQL estar pronto...")
+    if not wait_for_postgres(db_host, db_port, db_user, db_pass, db_name):
+        print("  ERRO: Impossivel conectar ao PostgreSQL. Abortando.")
         return
     
     # 5. Conectar ao PostgreSQL
@@ -111,7 +111,7 @@ def ingest_fertility_data():
         return
     
     # 6. Verificar dados existentes
-    print("\n Verificando dados existentes...")
+    print("\n Verificando dados existentes em fertility_warehouse.fact_fertility...")
     try:
         cur.execute("SELECT COUNT(*) FROM fertility_warehouse.fact_fertility")
         existing_count = cur.fetchone()[0]
@@ -138,33 +138,32 @@ def ingest_fertility_data():
             end_idx = min(start_idx + batch_size, len(df))
             batch_df = df.iloc[start_idx:end_idx]
             
-            # Preparar dados
+            # Preparar dados respeitando ordem das colunas do init.sql
             values = []
             for _, row in batch_df.iterrows():
                 values.append((
-                    row.get('age', 0),
+                    int(row.get('age', 0)),
                     row.get('season', ''),
-                    row.get('childrens_count', 0) if 'childrens_count' in row else None,
-                    row.get('childish_diseases', 0) if 'childish_diseases' in row else None,
-                    row.get('accident_or_serious_trauma', 0) if 'accident_or_serious_trauma' in row else None,
-                    row.get('surgical_intervention', 0) if 'surgical_intervention' in row else None,
-                    row.get('high_fevers_in_the_last_year', 0) if 'high_fevers_in_the_last_year' in row else None,
-                    row.get('frequency_of_alcohol_consumption', 0) if 'frequency_of_alcohol_consumption' in row else None,
+                    row.get('childish_diseases', ''),
+                    row.get('accident_or_serious_trauma', ''),
+                    row.get('surgical_intervention', ''),
+                    row.get('high_fevers_in_the_last_year', ''),
+                    row.get('frequency_of_alcohol_consumption', ''),
                     row.get('smoking_habit', ''),
                     int(row.get('number_of_hours_spent_sitting_per_day', 0)),
                     row.get('diagnosis', '')
                 ))
             
-            # Inserir batch na tabela correta
+            # Inserir batch em fertility_warehouse.fact_fertility
             insert_sql = """
             INSERT INTO fertility_warehouse.fact_fertility 
-            (age, season, childrens_count, childish_diseases, accident_or_serious_trauma,
+            (age, season, childish_diseases, accident_or_serious_trauma,
              surgical_intervention, high_fevers_in_the_last_year,
              frequency_of_alcohol_consumption, smoking_habit,
              number_of_hours_spent_sitting_per_day, diagnosis)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            
+
             cur.executemany(insert_sql, values)
             conn.commit()
             
@@ -215,3 +214,4 @@ def ingest_fertility_data():
 
 if __name__ == "__main__":
     ingest_fertility_data()
+

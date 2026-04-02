@@ -22,7 +22,8 @@
       "datasource": "PostgreSQL Fertility",
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "thresholds"},
+          "color": {"mode": "palette-classic"},
+          "custom": {"hideFrom": {"tooltip": false, "viz": false, "legend": false}},
           "mappings": [],
           "thresholds": {"mode": "absolute", "steps": [{"color": "blue", "value": null}]},
           "unit": "short"
@@ -33,7 +34,7 @@
       "id": 1,
       "options": {
         "colorMode": "background",
-        "graphMode": "none",
+        "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {"values": false, "calcs": ["lastNotNull"], "fields": ""},
@@ -65,7 +66,7 @@
       "id": 2,
       "options": {
         "colorMode": "background",
-        "graphMode": "none",
+        "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {"values": false, "calcs": ["lastNotNull"], "fields": ""},
@@ -79,7 +80,7 @@
           "refId": "A"
         }
       ],
-      "title": "Alterados",
+      "title": "Diagnóstico Alterado",
       "type": "stat"
     },
     {
@@ -97,7 +98,7 @@
       "id": 3,
       "options": {
         "colorMode": "background",
-        "graphMode": "none",
+        "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {"values": false, "calcs": ["lastNotNull"], "fields": ""},
@@ -111,7 +112,39 @@
           "refId": "A"
         }
       ],
-      "title": "Normais",
+      "title": "Diagnóstico Normal",
+      "type": "stat"
+    },
+    {
+      "datasource": "PostgreSQL Fertility",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "orange", "value": null}]},
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {"values": false, "calcs": ["lastNotNull"], "fields": ""},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT ROUND(100.0 * SUM(CASE WHEN diagnosis = 'Altered' THEN 1 ELSE 0 END) / COUNT(*), 1) as value FROM fertility_warehouse.fact_fertility",
+          "refId": "A"
+        }
+      ],
+      "title": "Taxa de Alteração",
       "type": "stat"
     },
     {
@@ -124,8 +157,8 @@
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 4},
-      "id": 4,
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 4},
+      "id": 5,
       "options": {
         "legend": {"displayMode": "list", "placement": "bottom", "values": ["value", "percent"]},
         "pieType": "pie",
@@ -139,7 +172,7 @@
           "refId": "A"
         }
       ],
-      "title": "Distribuição de Diagnósticos",
+      "title": "Diagnósticos",
       "type": "piechart"
     },
     {
@@ -152,35 +185,7 @@
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 4},
-      "id": 5,
-      "options": {
-        "legend": {"displayMode": "list", "placement": "bottom", "values": ["value", "percent"]},
-        "pieType": "pie",
-        "tooltip": {"mode": "single"}
-      },
-      "pluginVersion": "8.0.0",
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT COALESCE(season, 'N/A')::VARCHAR(50) as season, COUNT(*)::BIGINT as value FROM fertility_warehouse.fact_fertility GROUP BY season ORDER BY value DESC",
-          "refId": "A"
-        }
-      ],
-      "title": "Distribuição por Estação",
-      "type": "piechart"
-    },
-    {
-      "datasource": "PostgreSQL Fertility",
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "palette-classic"},
-          "custom": {"hideFrom": {"tooltip": false, "viz": false, "legend": false}},
-          "mappings": []
-        },
-        "overrides": []
-      },
-      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 4},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 4},
       "id": 6,
       "options": {
         "legend": {"displayMode": "list", "placement": "bottom", "values": ["value", "percent"]},
@@ -191,11 +196,39 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(smoking_habit, 'N/A')::VARCHAR(50) as smoking_habit, COUNT(*)::BIGINT as value FROM fertility_warehouse.fact_fertility GROUP BY smoking_habit ORDER BY value DESC",
+          "rawSql": "SELECT COALESCE(season, 'Sem dados')::VARCHAR(50) as season, COUNT(*)::BIGINT as value FROM fertility_warehouse.fact_fertility GROUP BY season ORDER BY value DESC",
           "refId": "A"
         }
       ],
-      "title": "Distribuição por Hábito de Fumo",
+      "title": "Estações",
+      "type": "piechart"
+    },
+    {
+      "datasource": "PostgreSQL Fertility",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {"hideFrom": {"tooltip": false, "viz": false, "legend": false}},
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 4},
+      "id": 7,
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom", "values": ["value", "percent"]},
+        "pieType": "pie",
+        "tooltip": {"mode": "single"}
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COALESCE(smoking_habit, 'Sem dados')::VARCHAR(50) as smoking_habit, COUNT(*)::BIGINT as value FROM fertility_warehouse.fact_fertility GROUP BY smoking_habit ORDER BY value DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Hábito de Fumo",
       "type": "piechart"
     },
     {
@@ -208,8 +241,8 @@
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
-      "id": 7,
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 12},
+      "id": 8,
       "options": {
         "legend": {"displayMode": "list", "placement": "bottom"},
         "tooltip": {"mode": "multi"}
@@ -218,11 +251,11 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT number_of_hours_spent_sitting_per_day::INT as hours, COUNT(*)::BIGINT as value FROM fertility_warehouse.fact_fertility WHERE number_of_hours_spent_sitting_per_day IS NOT NULL GROUP BY number_of_hours_spent_sitting_per_day ORDER BY hours ASC",
+          "rawSql": "SELECT number_of_hours_spent_sitting_per_day::INT as horas, COUNT(*)::BIGINT as pacientes FROM fertility_warehouse.fact_fertility WHERE number_of_hours_spent_sitting_per_day IS NOT NULL GROUP BY number_of_hours_spent_sitting_per_day ORDER BY horas ASC",
           "refId": "A"
         }
       ],
-      "title": "Distribuição de Horas Sentado",
+      "title": "Horas Sentado por Dia",
       "type": "barchart"
     },
     {
@@ -235,14 +268,14 @@
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
-      "id": 8,
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 20},
+      "id": 9,
       "options": {"showHeader": true, "sortBy": []},
       "pluginVersion": "8.0.0",
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT diagnosis::VARCHAR(100) as diagnosis, COUNT(*)::BIGINT as total, ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) as percent_total FROM fertility_warehouse.fact_fertility WHERE diagnosis IS NOT NULL GROUP BY diagnosis ORDER BY total DESC",
+          "rawSql": "SELECT diagnosis::VARCHAR(100) as Diagnóstico, COUNT(*)::BIGINT as Total, ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) as Percentual FROM fertility_warehouse.fact_fertility WHERE diagnosis IS NOT NULL GROUP BY diagnosis ORDER BY Total DESC",
           "refId": "A"
         }
       ],

@@ -24,7 +24,7 @@ def main():
     """Função principal do pipeline."""
     
     parser = argparse.ArgumentParser(
-        description="🧬 Fertility Data Pipeline - Lab01_PART2",
+        description=" Fertility Data Pipeline - Lab01_PART2",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Exemplos de uso:
