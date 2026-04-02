@@ -57,8 +57,8 @@ engine = create_engine(DATABASE_URL)
 fact_table = silver_data.copy()
 fact_table.insert(0, 'patient_id', range(1, len(fact_table) + 1))
 
-fact_table.to_sql('fact_fertility', engine, if_exists='replace', index=False)
-print(f"[OK] Fact Table criada: {len(fact_table)} registros")
+fact_table.to_sql('fact_fertility', engine, if_exists='replace', index=False, schema='fertility_warehouse')
+print(f"[OK] Fact Table criada: {len(fact_table)} registros em fertility_warehouse.fact_fertility")
 
 # Criar dimensões (Dimension Tables)
 # Dimensão Idade (binned)
@@ -69,21 +69,21 @@ age_dimension = pd.DataFrame({
                         bins=[0, 28, 30, 32, 50], 
                         labels=['Young (27-28)', 'Middle (29-30)', 'Senior (31-32)', 'Older (33+)']).astype(str)
 })
-age_dimension.to_sql('dim_age', engine, if_exists='replace', index=False)
+age_dimension.to_sql('dim_age', engine, if_exists='replace', index=False, schema='fertility_warehouse')
 
 # Dimensão Estação
 season_dimension = pd.DataFrame({
     'season_id': range(1, len(silver_data['season'].unique()) + 1),
     'season': silver_data['season'].unique()
 })
-season_dimension.to_sql('dim_season', engine, if_exists='replace', index=False)
+season_dimension.to_sql('dim_season', engine, if_exists='replace', index=False, schema='fertility_warehouse')
 
 # Dimensão Diagnóstico
 diagnosis_dimension = pd.DataFrame({
     'diagnosis_id': range(1, len(silver_data['diagnosis'].unique()) + 1),
     'diagnosis': silver_data['diagnosis'].unique()
 })
-diagnosis_dimension.to_sql('dim_diagnosis', engine, if_exists='replace', index=False)
+diagnosis_dimension.to_sql('dim_diagnosis', engine, if_exists='replace', index=False, schema='fertility_warehouse')
 
 print("[OK] Dimensões criadas (Idade, Estação, Diagnóstico)")
 
@@ -99,7 +99,7 @@ SELECT
     COUNT(*) as total_patients,
     SUM(CASE WHEN diagnosis = 'Altered' THEN 1 ELSE 0 END) as altered_diagnosis,
     ROUND(100.0 * SUM(CASE WHEN diagnosis = 'Altered' THEN 1 ELSE 0 END) / COUNT(*), 2) as taxa_alteracao_pct
-FROM fact_fertility
+FROM fertility_warehouse.fact_fertility
 GROUP BY smoking_habit
 ORDER BY taxa_alteracao_pct DESC
 """
@@ -143,7 +143,7 @@ WITH sedentary_binned AS (
         COUNT(*) as total_patients,
         SUM(CASE WHEN diagnosis = 'Altered' THEN 1 ELSE 0 END) as altered_diagnosis,
         ROUND(100.0 * SUM(CASE WHEN diagnosis = 'Altered' THEN 1 ELSE 0 END) / COUNT(*), 2) as taxa_alteracao_pct
-    FROM fact_fertility
+    FROM fertility_warehouse.fact_fertility
     GROUP BY sedentary_category
 )
 SELECT * FROM sedentary_binned
@@ -178,7 +178,7 @@ SELECT
     SUM(CASE WHEN diagnosis = 'Altered' THEN 1 ELSE 0 END) as altered_diagnosis,
     SUM(CASE WHEN diagnosis = 'Normal' THEN 1 ELSE 0 END) as normal_diagnosis,
     ROUND(100.0 * SUM(CASE WHEN diagnosis = 'Altered' THEN 1 ELSE 0 END) / COUNT(*), 2) as taxa_alteracao_pct
-FROM fact_fertility
+FROM fertility_warehouse.fact_fertility
 GROUP BY season
 ORDER BY taxa_alteracao_pct DESC
 """
@@ -267,7 +267,7 @@ SELECT
     ROUND(AVG(CASE WHEN smoking_habit IN ('daily', 'occasional') THEN 1 ELSE 0 END) * 100, 1) as pct_fumantes,
     ROUND(AVG(CASE WHEN childish_diseases = 'yes' THEN 1 ELSE 0 END) * 100, 1) as pct_dencas_infantis,
     ROUND(AVG(CASE WHEN surgical_intervention = 'yes' THEN 1 ELSE 0 END) * 100, 1) as pct_cirurgias
-FROM fact_fertility
+FROM fertility_warehouse.fact_fertility
 GROUP BY age_group
 ORDER BY age_group
 """

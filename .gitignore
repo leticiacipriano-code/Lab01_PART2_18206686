@@ -1,4 +1,6 @@
-# Python
+# ============================================================================
+# PYTHON & BUILD SYSTEM
+# ============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -20,16 +22,21 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
 
-# Virtual Environments
+# ============================================================================
+# VIRTUAL ENVIRONMENTS
+# ============================================================================
+.venv/
 .venv
 venv/
 ENV/
 env/
-.env.local
-.env.*.local
 
-# IDE
+# ============================================================================
+# IDE & EDITORS
+# ============================================================================
 .vscode/
 .idea/
 *.swp
@@ -38,57 +45,179 @@ env/
 .DS_Store
 *.sublime-project
 *.sublime-workspace
+*.code-workspace
+.history/
 
-# Docker
-.dockerignore
-docker-compose.override.yml
+# ============================================================================
+# PYTHON DEVELOPMENT TOOLS
+# ============================================================================
+# Black
+.black_cache/
 
-# Great Expectations
-gx_context/uncommitted/
-gx_context/expectations/
-gx_context/plugins/
+# isort
+.isort.cfg
 
-# Data (keep CSVs/configs, ignore temp/cache)
-*.db
-*.sqlite
-*.duckdb
-/data_raw/*.parquet
-/data_raw/*.pickle
-/data_silver/*.csv
-/data_gold/*.db
-.great_expectations/
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
 
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb_checkpoints
+# Pylint
+.pylintrc
 
-# Test/Coverage
+# Pre-commit
+.pre-commit-config.yaml.orig
+
+# ============================================================================
+# TESTING & COVERAGE
+# ============================================================================
 .coverage
+.coverage.*
 .pytest_cache/
 htmlcov/
 .hypothesis/
+.tox/
 
-# Logs
+# ============================================================================
+# DOCKER
+# ============================================================================
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# ============================================================================
+# GREAT EXPECTATIONS
+# ============================================================================
+gx_context/uncommitted/
+gx_context/expectations/
+gx_context/plugins/
+gx_context/fixtures/
+
+# ============================================================================
+# DATA FILES
+# ============================================================================
+# Ignore generated/temp data but keep raw sources
+*.db
+*.sqlite
+*.sqlite3
+*.duckdb
+/data_raw/*.parquet
+/data_raw/*.pickle
+/data_raw/temp/
+/data_silver/*.csv
+/data_silver/*.parquet
+/data_silver/temp/
+/data_gold/*.db
+/data_gold/temp/
+.great_expectations/
+*.tmp.csv
+
+# ============================================================================
+# JUPYTER NOTEBOOKS
+# ============================================================================
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+.jupyter/
+*.nb.html
+
+# ============================================================================
+# LOGS
+# ============================================================================
 *.log
 logs/
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Temporary files
+# ============================================================================
+# TEMPORARY & BACKUP FILES
+# ============================================================================
 *.tmp
 *.temp
 *.bak
+*.backup
 *.swp
+*.swo
+*~
+.~*
+*.orig
+*.merge
+*.CONFLICT
 
-# OS
+# ============================================================================
+# OS SPECIFIC
+# ============================================================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
+ehthumbs.db
 
-# Grafana (local testing)
+# ============================================================================
+# GRAFANA (LOCAL DEVELOPMENT)
+# ============================================================================
 grafana/data/
 grafana/provisioning/*/uncommitted/
+grafana/dashboards/*/cache/
 
-# Config (except example files)
+# ============================================================================
+# CONFIGURATION FILES
+# ============================================================================
+# Ignore local .env files, but keep examples
 .env
+.env.local
+.env.*.local
 !.env.example
 
-# Node modules (if using node tools)
+# ============================================================================
+# BUILD & DEPLOYMENT
+# ============================================================================
+dist/
+build/
+*.egg-info/
+.eggs/
+wheelhouse/
+
+# ============================================================================
+# VERSION CONTROL & MERGE
+# ============================================================================
+*.orig
+*.merge
+MERGE_HEAD
+MERGE_MSG
+*.BACKUP.*
+*.BASE.*
+*.REMOTE.*
+*.LOCAL.*
+
+# ============================================================================
+# NODE MODULES (if using frontend tools)
+# ============================================================================
 node_modules/
+npm-debug.log
+
+# ============================================================================
+# POSTGRESQL & DATABASE  
+# ============================================================================
+*.sql.bak
+*.sql.backup
+pgpass
+.pgpass
+postgresql.conf.orig
+
+# ============================================================================
+# PROJECT SPECIFIC
+# ============================================================================
+# Lock files from different package managers (keep only what's used)
+# Uncomment as needed:
+# poetry.lock
+# Pipfile.lock
+# Only uv.lock.txt is committed in this project
+
+# Cache directories
+.cache/
+*.cache
+cache/

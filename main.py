@@ -24,7 +24,7 @@ def main():
     """Função principal do pipeline."""
     
     parser = argparse.ArgumentParser(
-        description="🧬 Fertility Data Pipeline - Lab01_PART2",
+        description=" Fertility Data Pipeline - Lab01_PART2",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Exemplos de uso:
@@ -46,28 +46,28 @@ Exemplos de uso:
     args = parser.parse_args()
     
     print("\n" + "=" * 70)
-    print("🧬 FERTILITY DATA PIPELINE - MENU PRINCIPAL")
+    print(" FERTILITY DATA PIPELINE - MENU PRINCIPAL")
     print("=" * 70)
     
     if args.action in ["validate", "full"]:
-        print("\n▶️  ETAPA 1: VALIDAÇÃO COM GREAT EXPECTATIONS")
+        print("\n  ETAPA 1: VALIDAÇÃO COM GREAT EXPECTATIONS")
         try:
             setup_great_expectations()
         except Exception as e:
-            print(f"❌ Erro na validação: {e}")
+            print(f" Erro na validação: {e}")
             if args.action != "full":
                 return 1
     
     if args.action in ["ingest", "full"]:
-        print("\n▶️  ETAPA 2: INGESTÃO DE DADOS")
+        print("\n ETAPA 2: INGESTÃO DE DADOS")
         try:
             ingest_fertility_data()
         except Exception as e:
-            print(f"❌ Erro na ingestão: {e}")
+            print(f" Erro na ingestão: {e}")
             return 1
     
     print("\n" + "=" * 70)
-    print("✅ PIPELINE CONCLUÍDO COM SUCESSO!")
+    print(" PIPELINE CONCLUÍDO COM SUCESSO!")
     print("=" * 70)
     print("""
 📊 Próximos passos:

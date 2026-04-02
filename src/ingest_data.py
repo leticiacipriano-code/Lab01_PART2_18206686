@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """
-Script de ingestão principal: carrega dados de fertility_1m.csv para PostgreSQL.
+Script de ingestão: carrega dados processados (Silver Layer) para PostgreSQL Warehouse.
 
 Este script:
-1. Carrega dados do CSV
-2. Valida qualidade com Great Expectations
-3. Insere em batches no PostgreSQL
+1. Lê dados do fertility_silver.parquet (já processados e validados)
+2. Conecta ao PostgreSQL fertility_db
+3. Insere em fertility_warehouse.fact_fertility em batches
 4. Verifica integridade final
 """
 
 import os
 import sys
+import time
 import pandas as pd
 import psycopg
 from pathlib import Path
@@ -22,16 +23,42 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from setup_great_expectations import setup_great_expectations
 
 
+def wait_for_postgres(db_host, db_port, db_user, db_pass, db_name=None, max_retries=30):
+    """Aguarda PostgreSQL estar pronto para aceitar conexoes."""
+    for attempt in range(max_retries):
+        try:
+            if db_name is None:
+                conn = psycopg.connect(
+                    host=db_host, port=db_port, user=db_user, password=db_pass,
+                    connect_timeout=5, dbname="postgres"
+                )
+            else:
+                conn = psycopg.connect(
+                    host=db_host, port=db_port, user=db_user, password=db_pass,
+                    connect_timeout=5, dbname=db_name
+                )
+            conn.close()
+            print(f"   OK PostgreSQL pronto")
+            return True
+        except Exception as e:
+            if attempt < max_retries - 1:
+                print(f"   Tentativa {attempt + 1}/{max_retries}...")
+                time.sleep(1)
+            else:
+                print(f"   ERRO: {e}")
+    return False
+
+
 def ingest_fertility_data():
-    """Executa pipeline de ingestão completo."""
+    """Executa pipeline de ingestão de dados processados para warehouse."""
     
     print("\n" + "=" * 70)
-    print(" PIPELINE DE INGESTÃO - FERTILITY DATA")
+    print(" PIPELINE DE INGESTÃO - FERTILITY DATA (SILVER → WAREHOUSE)")
     print("=" * 70)
     
-    # 1. Carregar variáveis de ambiente
-    print("\n Carregando configurações...")
-    load_dotenv()
+    # 1. Carregar variaveis de ambiente (NAO sobrescrever ja definidas)
+    print("\n Carregando configuracoes...")
+    load_dotenv(override=False)  # Respeita variaveis ja definidas pelo docker-compose
     
     db_host = os.getenv("DB_HOST", "localhost")
     db_port = int(os.getenv("DB_PORT", "5432"))
@@ -42,24 +69,33 @@ def ingest_fertility_data():
     print(f"  Banco de dados: {db_user}@{db_host}:{db_port}/{db_name}")
     
     project_root = Path(__file__).parent.parent
-    csv_path = project_root / "data_raw" / "fertility_1m.csv"
+    parquet_path = project_root / "data_silver" / "fertility_silver.parquet"
     
-    # 2. Validar dados com Great Expectations
-    print("\n Validando dados com Great Expectations...")
-    setup_great_expectations()
+    # 2. Verificar se arquivo parquet existe
+    print("\n Verificando dados processados...")
+    if not parquet_path.exists():
+        print(f"  ERRO: Arquivo {parquet_path} nao encontrado.")
+        print("  Execute silver.py primeiro para processar os dados brutos.")
+        return
     
-    # 3. Carregar dados
-    print("\n Carregando dados do CSV...")
+    # 3. Carregar dados do parquet
+    print(f"\n Carregando dados de {parquet_path.name}...")
     try:
-        df = pd.read_csv(csv_path)
+        df = pd.read_parquet(parquet_path)
         print(f"   {len(df):,} registros carregados")
         print(f"   Colunas: {list(df.columns)}")
     except Exception as e:
-        print(f"   Erro ao carregar CSV: {e}")
+        print(f"   ERRO ao carregar parquet: {e}")
         return
     
-    # 4. Conectar ao PostgreSQL
-    print(f"\n Conectando ao PostgreSQL ({db_host}:{db_port})...")
+    # 4. Aguardar PostgreSQL estar pronto
+    print("\n Aguardando PostgreSQL estar pronto...")
+    if not wait_for_postgres(db_host, db_port, db_user, db_pass, db_name):
+        print("  ERRO: Impossivel conectar ao PostgreSQL. Abortando.")
+        return
+    
+    # 5. Conectar ao PostgreSQL
+    print(f"\n Conectando ao PostgreSQL ({db_host}:{db_port}/{db_name})...")
     try:
         conn = psycopg.connect(
             host=db_host,
@@ -69,55 +105,27 @@ def ingest_fertility_data():
             password=db_pass
         )
         cur = conn.cursor()
-        print("   Conexão estabelecida")
+        print("   OK conexao estabelecida")
     except Exception as e:
-        print(f"   Erro ao conectar: {e}")
-        return
-    
-    # 5. Criar tabela se não existir
-    print("\n  Preparando tabela no banco de dados...")
-    try:
-        create_table_sql = """
-        CREATE TABLE IF NOT EXISTS fertility_data (
-            id SERIAL PRIMARY KEY,
-            season VARCHAR(50),
-            age INT,
-            childish_diseases VARCHAR(50),
-            accident_or_serious_trauma VARCHAR(50),
-            surgical_intervention VARCHAR(50),
-            high_fevers_in_the_last_year VARCHAR(50),
-            frequency_of_alcohol_consumption VARCHAR(50),
-            smoking_habit VARCHAR(50),
-            number_of_hours_spent_sitting_per_day INT,
-            diagnosis VARCHAR(100),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-        """
-        cur.execute(create_table_sql)
-        conn.commit()
-        print("   Tabela criada ou já existe")
-    except Exception as e:
-        print(f"  Erro ao criar tabela: {e}")
-        conn.close()
+        print(f"   ERRO ao conectar: {e}")
         return
     
     # 6. Verificar dados existentes
-    print("\n  Verificando dados existentes...")
+    print("\n Verificando dados existentes em fertility_warehouse.fact_fertility...")
     try:
-        cur.execute("SELECT COUNT(*) FROM fertility_data")
+        cur.execute("SELECT COUNT(*) FROM fertility_warehouse.fact_fertility")
         existing_count = cur.fetchone()[0]
         print(f"   Registros existentes: {existing_count:,}")
         
         if existing_count > 0:
-            print("    Dados já existem no banco. Pulando ingestão.")
-            # Apenas validar
-            cur.execute("SELECT COUNT(DISTINCT diagnosis) FROM fertility_data")
+            print("   Dados ja existem no banco. Pulando ingestao.")
+            cur.execute("SELECT COUNT(DISTINCT diagnosis) FROM fertility_warehouse.fact_fertility")
             diagnoses = cur.fetchone()[0]
-            print(f"  Diagnósticos únicos: {diagnoses}")
+            print(f"   Diagnosticos unicos: {diagnoses}")
             conn.close()
             return
     except Exception as e:
-        print(f"   Erro ao verificar: {e}")
+        print(f"   Nota: {e}")
     
     # 7. Inserir dados em batches
     print(f"\n Inserindo {len(df):,} registros em batches...")
@@ -130,12 +138,12 @@ def ingest_fertility_data():
             end_idx = min(start_idx + batch_size, len(df))
             batch_df = df.iloc[start_idx:end_idx]
             
-            # Preparar dados
+            # Preparar dados respeitando ordem das colunas do init.sql
             values = []
             for _, row in batch_df.iterrows():
                 values.append((
-                    row.get('season', ''),
                     int(row.get('age', 0)),
+                    row.get('season', ''),
                     row.get('childish_diseases', ''),
                     row.get('accident_or_serious_trauma', ''),
                     row.get('surgical_intervention', ''),
@@ -146,16 +154,16 @@ def ingest_fertility_data():
                     row.get('diagnosis', '')
                 ))
             
-            # Inserir batch
+            # Inserir batch em fertility_warehouse.fact_fertility
             insert_sql = """
-            INSERT INTO fertility_data 
-            (season, age, childish_diseases, accident_or_serious_trauma,
+            INSERT INTO fertility_warehouse.fact_fertility 
+            (age, season, childish_diseases, accident_or_serious_trauma,
              surgical_intervention, high_fevers_in_the_last_year,
              frequency_of_alcohol_consumption, smoking_habit,
              number_of_hours_spent_sitting_per_day, diagnosis)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            
+
             cur.executemany(insert_sql, values)
             conn.commit()
             
@@ -163,7 +171,7 @@ def ingest_fertility_data():
             print(f"   [{batch_num + 1}/{total_batches}] {progress:.1f}% "
                   f"({(batch_num + 1) * batch_size:,} registros)")
         
-        print("   Ingestão completa!")
+        print("   OK Ingestao completa!")
         
     except Exception as e:
         print(f"  Erro durante ingestão: {e}")
@@ -172,27 +180,27 @@ def ingest_fertility_data():
         return
     
     # 8. Verificar integridade
-    print("\n  Verificando integridade dos dados...")
+    print("\n Verificando integridade dos dados...")
     try:
-        cur.execute("SELECT COUNT(*) FROM fertility_data")
+        cur.execute("SELECT COUNT(*) FROM fertility_warehouse.fact_fertility")
         total_count = cur.fetchone()[0]
         
-        cur.execute("SELECT diagnosis, COUNT(*) FROM fertility_data GROUP BY diagnosis")
+        cur.execute("SELECT diagnosis, COUNT(*) FROM fertility_warehouse.fact_fertility GROUP BY diagnosis ORDER BY COUNT(*) DESC")
         diagnoses = cur.fetchall()
         
-        cur.execute("SELECT season, COUNT(*) FROM fertility_data GROUP BY season")
+        cur.execute("SELECT season, COUNT(*) FROM fertility_warehouse.fact_fertility GROUP BY season ORDER BY season")
         seasons = cur.fetchall()
         
         print(f"   Total de registros: {total_count:,}")
-        print(f"   Diagnósticos:")
+        print(f"   Diagnosticos:")
         for diag, count in diagnoses:
             print(f"      - {diag}: {count:,}")
-        print(f"   Estações:")
+        print(f"   Estacoes:")
         for season, count in seasons:
             print(f"      - {season}: {count:,}")
         
     except Exception as e:
-        print(f"   Erro ao verificar: {e}")
+        print(f"   Nota: {e}")
     
     conn.close()
     
@@ -206,3 +214,4 @@ def ingest_fertility_data():
 
 if __name__ == "__main__":
     ingest_fertility_data()
+
